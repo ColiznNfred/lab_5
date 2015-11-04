@@ -96,7 +96,7 @@ public class Main
         return in.nextLine();
     }
 
-    private static int[] getDistances(String configFile) {
+    private static int[] getDistances() {
         int[] toReturn = new int[3];
         try {
             FileReader fileReader = new FileReader(configFile);

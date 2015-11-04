@@ -111,9 +111,44 @@ public class Main
         return in.nextLine();
     }
 
-    private static int[] fileAccess(String configFile) {
-        FileReader fileReader = new FileReader(fileReader);
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
-                
+    private static int[] getDistances() {
+        int[] toReturn = new int[3];
+        try {
+            FileReader fileReader = new FileReader(configFile);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line = bufferedReader.readLine();
+            StringBuilder sb = new StringBuilder();
+            int i=0;
+            char ch = line.charAt(i);
+            while (ch != ' ') {
+                sb.append(ch);
+                i++;
+                ch = line.charAt(i);
+            }
+            String firstNumber = sb.toString();
+            int number = Integer.parseInt(firstNumber);
+            String line2 = bufferedReader.readLine();
+            String line3 = bufferedReader.readLine();
+            String line4 = bufferedReader.readLine();
+            if(number==instanceNumber){ // if the rounter is the first in the list, get the first column of numbers
+                    toReturn[0] = (int)line2.charAt(0);
+                    toReturn[1] = (int)line3.charAt(0);
+                    toReturn[2] = (int)line4.charAt(0);
+            }
+            else if(number==(instanceNumber+1)){ // second router gets second column
+                toReturn[0] = (int)line2.charAt(2);
+                toReturn[1] = (int)line3.charAt(2);
+                toReturn[2] = (int)line4.charAt(2);
+            }
+            else if(number==(instanceNumber+2)){ // third router gets third column
+                toReturn[0] = (int)line2.charAt(4);
+                toReturn[1] = (int)line3.charAt(4);
+                toReturn[2] = (int)line4.charAt(4);
+            }
+            bufferedReader.close();
+        } catch (Exception ex) {
+            System.out.println("Error " + ex);
+        }
+        return  toReturn;
     }
 }

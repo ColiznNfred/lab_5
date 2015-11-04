@@ -23,9 +23,22 @@ public class Main
         return in.nextLine();
     }
 
-    private int[3] fileAccess(String configFile) {
-        FileReader fileReader = new FileReader(fileReader);
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
-                
+    private int[] fileAccess(String configFile) {
+        try {
+            FileReader fileReader = new FileReader(fileReader);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line = bufferedReader.readLine();
+            StringBuilder sb = new StringBuilder();
+            char ch = line.nextChar();
+            while(ch!=' '){
+                sb.append(ch);
+                ch = line.nextChar();
+            }
+
+            bufferedReader.close();
+        }
+        catch(Exception ex){
+            System.out.println("Error "+ex);
+        }
     }
 }

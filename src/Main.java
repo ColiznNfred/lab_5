@@ -4,15 +4,34 @@ import java.io.*; // for files
 
 public class Main
 {
-    private int instanceNumber = 6666;
+    private static int instanceNumber = 6666;
     public static String configFile = "configuration.txt";
     public static int[] distances;
     public static String routerName;
+    public static int portNumb;
+    public static int neighbor1Port;
+    public static int neighbor2Port;
+    public static DatagramSocket me;
+    public static InetAddress IPAddress;
+    public static DatagramPacket packet;
 
     public static void main(String args)
     {
         distances = new int[] {-1, -1, -1};
+
+        // TODO: read in values from file
+
         routerName = getRouter();
+        try { IPAddress = InetAddress.getByName("localhost"); me = new DatagramSocket(portNumb); } catch (Exception e) { System.out.println("Error: " + e); }
+
+        printDistances();
+
+        sendDistances();
+
+        while (true)
+        {
+            receiveDistVectors();
+        }
     }
 
 
@@ -21,15 +40,6 @@ public class Main
      * Helper Functions go here
      *
      ********************************/
-
-    /**
-     * This function will prepare this client to receive values
-     * from its neighbors
-     */
-    public static void openPorts()
-    {
-        // TODO: open port listening with receiveDistVector
-    }
 
     /**
      * This function will send its distances to its neighbors
@@ -44,6 +54,7 @@ public class Main
      */
     public static void printDistances()
     {
+        System.out.println("Router " + routerName + " is running on port " + portNumb);
         System.out.println("Distance vector on router " + routerName + " is: ");
         printCurrentDistances();
     }
@@ -51,14 +62,18 @@ public class Main
     /**
      * This function will receive data from neighbors
      */
-    public static int[] receiveDistVectors()
+    public static void receiveDistVectors()
     {
         int[] distances = new int[] {-1,-1,-1};
         String name = "";
 
         // TODO: Add decrypting message here
+        byte[] data = new byte[3];
+        packet = new DatagramPacket(data, data.length);
+        try { me.receive(packet); } catch (Exception e) { System.out.println("Error: " + e); }
 
         System.out.println("Receives distance vector from router " + name + ": <" + distances[0] + ", " + distances[1] + ", " + distances[2] + ">");
+        changeDistanceVectors(distances);
     }
 
     /**
@@ -72,7 +87,7 @@ public class Main
     /**
      * This function calculates the new distance vector
      */
-    public static void changeDistanceVectors()
+    public static void changeDistanceVectors(int[] neighborVector)
     {
         boolean updated = false;
 

@@ -15,23 +15,23 @@ public class Main
     public static InetAddress IPAddress;
     public static DatagramPacket packet;
 
-    public static void main(String args)
+    public static void main(String[] args)
     {
-        distances = new int[] {-1, -1, -1};
+        distances = getDistances();
 
         // TODO: read in values from file
 
-        routerName = getRouter();
-        try { IPAddress = InetAddress.getByName("localhost"); me = new DatagramSocket(portNumb); } catch (Exception e) { System.out.println("Error: " + e); }
-
-        printDistances();
-
-        sendDistances();
-
-        while (true)
-        {
-            receiveDistVectors();
-        }
+//        routerName = getRouter();
+//        try { IPAddress = InetAddress.getByName("localhost"); me = new DatagramSocket(portNumb); } catch (Exception e) { System.out.println("Error: " + e); }
+//
+//        printDistances();
+//
+//        sendDistances();
+//
+//        while (true)
+//        {
+//            receiveDistVectors();
+//        }
     }
 
 
@@ -70,7 +70,8 @@ public class Main
         // TODO: Add decrypting message here
         byte[] data = new byte[3];
         packet = new DatagramPacket(data, data.length);
-        try { me.receive(packet); } catch (Exception e) { System.out.println("Error: " + e); }
+        try { me.receive(packet); } catch (Exception e) { System.out.println("Error: " + e);
+        }
 
         System.out.println("Receives distance vector from router " + name + ": <" + distances[0] + ", " + distances[1] + ", " + distances[2] + ">");
         changeDistanceVectors(distances);

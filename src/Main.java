@@ -1,5 +1,11 @@
-/**
- * Created by personal on 11/3/15.
- */
+import java.util.*;
+import java.net.*;
+
+
 public class Main {
+}
+
+public static String getRouter() {
+    Scanner in = new Scanner(System.in);
+    return in.nextLine();
 }

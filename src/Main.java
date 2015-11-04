@@ -4,7 +4,7 @@ import java.io.*; // for files
 
 public class Main
 {
-    private static int instanceNumber = 6666;
+    private static int instanceNumber = 6668;
     public static String configFile = "configuration.txt";
     public static int[] distances;
     public static String routerName;
@@ -131,20 +131,20 @@ public class Main
             String line2 = bufferedReader.readLine();
             String line3 = bufferedReader.readLine();
             String line4 = bufferedReader.readLine();
-            if(number==instanceNumber){ // if the rounter is the first in the list, get the first column of numbers
+            if(number==instanceNumber){ // if the router is the first in the list, get the first column of numbers
                     toReturn[0] = (int)line2.charAt(0);
                     toReturn[1] = (int)line3.charAt(0);
                     toReturn[2] = (int)line4.charAt(0);
             }
-            else if(number==(instanceNumber+1)){ // second router gets second column
+            else if((number+1)==instanceNumber){ // second router gets second column
                 toReturn[0] = (int)line2.charAt(2);
                 toReturn[1] = (int)line3.charAt(2);
                 toReturn[2] = (int)line4.charAt(2);
             }
-            else if(number==(instanceNumber+2)){ // third router gets third column
-                toReturn[0] = (int)line2.charAt(4);
-                toReturn[1] = (int)line3.charAt(4);
-                toReturn[2] = (int)line4.charAt(4);
+            else if((number+2)==instanceNumber){ // third router gets third column
+                toReturn[0] = ((int)line2.charAt(4))-0x30;
+                toReturn[1] = ((int)line3.charAt(4))-0x30;
+                toReturn[2] = ((int)line4.charAt(4))-0x30;
             }
             bufferedReader.close();
         } catch (Exception ex) {

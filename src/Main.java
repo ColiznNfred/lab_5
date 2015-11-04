@@ -14,6 +14,10 @@ public class Main
     public static DatagramSocket me;
     public static InetAddress IPAddress;
     public static DatagramPacket packet;
+    public static int usIndex;
+    public static int neighbor1Index;
+    public static int neighbor2Index;
+
 
     public static void main(String[] args)
     {
@@ -47,6 +51,17 @@ public class Main
     public static void sendDistances()
     {
         // TODO: send distance vectors to neighbors
+        byte[] data = new byte[4];
+
+        data[0] = (byte) usIndex;
+        data[1] = (byte) distances[0];
+        data[2] = (byte) distances[1];
+        data[3] = (byte) distances[2];
+
+        DatagramPacket neighbor1 = new DatagramPacket(data, data.length, IPAddress, neighbor1Port);
+        DatagramPacket neighbor2 = new DatagramPacket(data, data.length, IPAddress, neighbor2Port);
+
+        try { me.send(neighbor1); me.send(neighbor2); } catch (Exception e) { System.out.println(e); }
     }
 
     /**
@@ -64,17 +79,21 @@ public class Main
      */
     public static void receiveDistVectors()
     {
-        int[] distances = new int[] {-1,-1,-1};
+        int[] receivedDistances = new int[] {-1,-1,-1};
         String name = "";
 
         // TODO: Add decrypting message here
-        byte[] data = new byte[3];
+        byte[] data = new byte[4];
         packet = new DatagramPacket(data, data.length);
-        try { me.receive(packet); } catch (Exception e) { System.out.println("Error: " + e);
-        }
+        try { me.receive(packet); } catch (Exception e) { System.out.println("Error: " + e); }
 
-        System.out.println("Receives distance vector from router " + name + ": <" + distances[0] + ", " + distances[1] + ", " + distances[2] + ">");
-        changeDistanceVectors(distances);
+        int neighbor = (int) data[0];
+        receivedDistances[0] = (int) data[1];
+        receivedDistances[1] = (int) data[2];
+        receivedDistances[2] = (int) data[3];
+
+        System.out.println("Receives distance vector from router " + name + ": <" + receivedDistances[0] + ", " + receivedDistances[1] + ", " + receivedDistances[2] + ">");
+        changeDistanceVectors(receivedDistances, neighbor);
     }
 
     /**
@@ -88,11 +107,21 @@ public class Main
     /**
      * This function calculates the new distance vector
      */
-    public static void changeDistanceVectors(int[] neighborVector)
+    public static void changeDistanceVectors(int[] neighborVector, int neighbor)
     {
         boolean updated = false;
 
         // TODO: do distance vector updates
+
+        if (neighbor == 1)
+        {
+            //int newDist = Math.min(neighborVector[neighbor2Index] + distances[neighbor1Index], );
+        }
+        // its neighbor 2
+        else
+        {
+
+        }
 
 
         if (updated)
@@ -151,7 +180,7 @@ public class Main
                 toReturn[i]-=0x30;
             }
         } catch (Exception ex) {
-            System.out.println("Error " + ex);
+            System.out.println(ex);
         }
         return  toReturn;
     }

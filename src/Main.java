@@ -121,7 +121,7 @@ public class Main
             StringBuilder sb = new StringBuilder();
             int i=0;
             char ch = line.charAt(i);
-            while (ch != ' ') {
+            while (ch != '\t') {
                 sb.append(ch);
                 i++;
                 ch = line.charAt(i);

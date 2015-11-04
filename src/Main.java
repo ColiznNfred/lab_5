@@ -1,11 +1,11 @@
 import java.util.*;
 import java.net.*;
-imnport java.io.*; // for files
+import java.io.*; // for files
 
 public class Main
 {
     private int instanceNumber = 6666;
-    configFile = "configuration.txt";
+    public static String configFile = "configuration.txt";
     public static int[] distances;
     public static String routerName;
 
@@ -96,7 +96,7 @@ public class Main
         return in.nextLine();
     }
 
-    private int[3] fileAccess(String configFile) {
+    private static int[] fileAccess(String configFile) {
         FileReader fileReader = new FileReader(fileReader);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
                 

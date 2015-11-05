@@ -6,7 +6,7 @@ public class Main
 {
     private static int instanceNumber = 6667;
     public static String configFile = "configuration.txt";
-    public static int[] distances;
+    public static int[][] distances;
     public static String routerName;
     public static int portNumb;
     public static int neighbor1Port;
@@ -54,9 +54,9 @@ public class Main
         byte[] data = new byte[4];
 
         data[0] = (byte) usIndex;
-        data[1] = (byte) distances[0];
-        data[2] = (byte) distances[1];
-        data[3] = (byte) distances[2];
+        data[1] = (byte) distances[1][instanceNumber-distances[0][0]];
+        data[2] = (byte) distances[2][instanceNumber-distances[0][0]];
+        data[3] = (byte) distances[2][instanceNumber-distances[0][0]];
 
         DatagramPacket neighbor1 = new DatagramPacket(data, data.length, IPAddress, neighbor1Port);
         DatagramPacket neighbor2 = new DatagramPacket(data, data.length, IPAddress, neighbor2Port);
@@ -141,8 +141,8 @@ public class Main
         return in.nextLine();
     }
 
-    private static int[] getDistances() {
-        int[] toReturn = new int[3];
+    private static int[][] getDistances() {
+        int[][] toReturn = new int[4][3];
         try {
             FileReader fileReader = new FileReader(configFile);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -157,28 +157,39 @@ public class Main
             }
             String firstNumber = sb.toString();
             int number = Integer.parseInt(firstNumber);
+            toReturn[0][0] = number;
+            i++; // move i past the \t
+            while (ch != '\t') {
+                sb.append(ch);
+                i++;
+                ch = line.charAt(i);
+            }
+            firstNumber = sb.toString();
+            number = Integer.parseInt(firstNumber);
+            toReturn[0][1]=number; // port of the second router
+            i++; // move i past the \t
+            while (ch != '\t') {
+                sb.append(ch);
+                i++;
+                ch = line.charAt(i);
+            }
+            firstNumber = sb.toString();
+            number = Integer.parseInt(firstNumber);
+            toReturn[0][2]=number; // port of the third router
             String line2 = bufferedReader.readLine();
             String line3 = bufferedReader.readLine();
             String line4 = bufferedReader.readLine();
-            if(number==instanceNumber){ // if the router is the first in the list, get the first column of numbers
-                    toReturn[0] = (int)line2.charAt(0);
-                    toReturn[1] = (int)line3.charAt(0);
-                    toReturn[2] = (int)line4.charAt(0);
-            }
-            else if((number+1)==instanceNumber){ // second router gets second column
-                toReturn[0] = (int)line2.charAt(2);
-                toReturn[1] = (int)line3.charAt(2);
-                toReturn[2] = (int)line4.charAt(2);
-            }
-            else if((number+2)==instanceNumber){ // third router gets third column
-                toReturn[0] = (int)line2.charAt(4);
-                toReturn[1] = (int)line3.charAt(4);
-                toReturn[2] = (int)line4.charAt(4);
-            }
+            toReturn[1][0] = ((int)line2.charAt(0)-0x30);
+            toReturn[2][0] = ((int)line3.charAt(0)-0x30);
+            toReturn[3][0] = ((int)line4.charAt(0)-0x30);
+            toReturn[1][1] = ((int)line2.charAt(2)-0x30);
+            toReturn[2][1] = ((int)line3.charAt(2)-0x30);
+            toReturn[3][1] = ((int)line4.charAt(2)-0x30);
+            toReturn[1][2] = ((int)line2.charAt(4)-0x30);
+            toReturn[2][2] = ((int)line3.charAt(4)-0x30);
+            toReturn[3][2] = ((int)line4.charAt(4)-0x30);
+            // reads all the distance values, as long as they are one char long
             bufferedReader.close();
-            for(i=0;i<toReturn.length;i++){
-                toReturn[i]-=0x30;
-            }
         } catch (Exception ex) {
             System.out.println(ex);
         }

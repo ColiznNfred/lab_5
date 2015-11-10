@@ -17,25 +17,54 @@ public class Main
     public static int usIndex;
     public static int neighbor1Index;
     public static int neighbor2Index;
+    public static int index;
 
 
     public static void main(String[] args)
     {
+        Scanner in = new Scanner(System.in);
         distances = getDistances();
 
-        // TODO: read in values from file
+        for (int i = 0; i < distances.length; i++)
+        {
+            for (int j = 0; j < distances[i].length; j++)
+            {
+                System.out.print(distances[i][j] + ", ");
+            }
+            System.out.println();
+        }
 
-//        routerName = getRouter();
-//        try { IPAddress = InetAddress.getByName("localhost"); me = new DatagramSocket(portNumb); } catch (Exception e) { System.out.println("Error: " + e); }
-//
-//        printDistances();
-//
-//        sendDistances();
-//
-//        while (true)
-//        {
-//            receiveDistVectors();
-//        }
+        // get which router we are
+        System.out.println("Enter the router’s ID: ");
+        String next = in.nextLine();
+        System.out.println(next);
+
+        index = 2;
+
+        if (next.equals("X"))
+        {
+            index = 0;
+        }
+        else if (next.equals("Y"))
+        {
+            index = 1;
+        }
+
+        portNumb = distances[0][index];
+
+        System.out.println(portNumb);
+
+        routerName = getRouter();
+        try { IPAddress = InetAddress.getByName("localhost"); me = new DatagramSocket(portNumb); } catch (Exception e) { System.out.println("Error: " + e); }
+
+        printDistances();
+
+        sendDistances();
+
+        while (true)
+        {
+            receiveDistVectors();
+        }
     }
 
 
@@ -101,7 +130,7 @@ public class Main
      */
     public static void printCurrentDistances()
     {
-        System.out.println("<" + distances[0] + "," + distances[1] + "," + distances[2] + ">");
+        System.out.println("<" + distances[index][0] + "," + distances[index][1] + "," + distances[index][2] + ">");
     }
 
     /**
@@ -157,8 +186,11 @@ public class Main
             }
             String firstNumber = sb.toString();
             int number = Integer.parseInt(firstNumber);
+            System.out.println(number);
             toReturn[0][0] = number;
             i++; // move i past the \t
+            ch = line.charAt(i);
+            sb = new StringBuilder();
             while (ch != '\t') {
                 sb.append(ch);
                 i++;
@@ -166,15 +198,22 @@ public class Main
             }
             firstNumber = sb.toString();
             number = Integer.parseInt(firstNumber);
+            System.out.println(number);
             toReturn[0][1]=number; // port of the second router
             i++; // move i past the \t
-            while (ch != '\t') {
+            ch = line.charAt(i);
+            sb = new StringBuilder();
+            while (ch != '\t' && i < line.length()) {
                 sb.append(ch);
                 i++;
-                ch = line.charAt(i);
+                if (i < line.length())
+                {
+                    ch = line.charAt(i);
+                }
             }
             firstNumber = sb.toString();
             number = Integer.parseInt(firstNumber);
+            System.out.println(number);
             toReturn[0][2]=number; // port of the third router
             String line2 = bufferedReader.readLine();
             String line3 = bufferedReader.readLine();

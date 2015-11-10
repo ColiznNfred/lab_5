@@ -17,7 +17,6 @@ public class Main
     public static int usIndex;
     public static int neighbor1Index;
     public static int neighbor2Index;
-    public static int index;
 
 
     public static void main(String[] args)
@@ -39,27 +38,78 @@ public class Main
         String next = in.nextLine();
         System.out.println(next);
 
-        index = 2;
+        usIndex = 2;
 
         if (next.equals("X"))
         {
-            index = 0;
+            usIndex = 0;
         }
         else if (next.equals("Y"))
         {
-            index = 1;
+            usIndex = 1;
         }
 
-        portNumb = distances[0][index];
+        neighbor1Index = (usIndex + 1) % 3;
+        neighbor2Index = (usIndex + 2) % 3;
+        neighbor1Port = distances[0][neighbor1Index];
+        neighbor2Port = distances[0][neighbor2Index];
+
+        portNumb = distances[0][usIndex];
 
         System.out.println(portNumb);
 
-        routerName = getRouter();
+        routerName = next;
         try { IPAddress = InetAddress.getByName("localhost"); me = new DatagramSocket(portNumb); } catch (Exception e) { System.out.println("Error: " + e); }
+
+
+        boolean ack1 = false;
+        boolean ack2 = false;
+
+        byte[] data = new byte[1];
+        data[0] = (byte) (usIndex + 20);
+        byte[] recieveData = new byte[1];
+
+        while (!ack1 || !ack2)
+        {
+            if (!ack1)
+            {
+                DatagramPacket neighbor1 = new DatagramPacket(data, data.length, IPAddress, neighbor1Port);
+
+                try { me.send(neighbor1); } catch (Exception e) { System.out.println(e); }
+            }
+
+            if (!ack2)
+            {
+                DatagramPacket neighbor2 = new DatagramPacket(data, data.length, IPAddress, neighbor2Port);
+
+                try { me.send(neighbor2); } catch (Exception e) { System.out.println(e); }
+            }
+
+            packet = new DatagramPacket(recieveData, recieveData.length);
+            try { me.receive(packet); } catch (Exception e) { System.out.println("Error: " + e); }
+
+            if (recieveData[0] == neighbor1Index + 20)
+            {
+                ack1 = true;
+                DatagramPacket neighbor1 = new DatagramPacket(data, data.length, IPAddress, neighbor1Port);
+
+                try { me.send(neighbor1); } catch (Exception e) { System.out.println(e); }
+            }
+            else if (recieveData[0] == neighbor2Index + 20)
+            {
+                ack2 = true;
+                DatagramPacket neighbor2 = new DatagramPacket(data, data.length, IPAddress, neighbor2Port);
+
+                try { me.send(neighbor2); } catch (Exception e) { System.out.println(e); }
+            }
+        }
+
+        System.out.println("After Acks: " + System.currentTimeMillis());
 
         printDistances();
 
         sendDistances();
+
 
         while (true)
         {
@@ -83,9 +133,9 @@ public class Main
         byte[] data = new byte[4];
 
         data[0] = (byte) usIndex;
-        data[1] = (byte) distances[1][instanceNumber-distances[0][0]];
-        data[2] = (byte) distances[2][instanceNumber-distances[0][0]];
-        data[3] = (byte) distances[2][instanceNumber-distances[0][0]];
+        data[1] = (byte) distances[usIndex + 1][0];
+        data[2] = (byte) distances[usIndex + 1][1];
+        data[3] = (byte) distances[usIndex + 1][2];
 
         DatagramPacket neighbor1 = new DatagramPacket(data, data.length, IPAddress, neighbor1Port);
         DatagramPacket neighbor2 = new DatagramPacket(data, data.length, IPAddress, neighbor2Port);
@@ -109,7 +159,6 @@ public class Main
     public static void receiveDistVectors()
     {
         int[] receivedDistances = new int[] {-1,-1,-1};
-        String name = "";
 
         // TODO: Add decrypting message here
         byte[] data = new byte[4];
@@ -117,11 +166,16 @@ public class Main
         try { me.receive(packet); } catch (Exception e) { System.out.println("Error: " + e); }
 
         int neighbor = (int) data[0];
+        if (neighbor > 15)
+        {
+            //sendDistances();
+            return;
+        }
         receivedDistances[0] = (int) data[1];
         receivedDistances[1] = (int) data[2];
         receivedDistances[2] = (int) data[3];
 
-        System.out.println("Receives distance vector from router " + name + ": <" + receivedDistances[0] + ", " + receivedDistances[1] + ", " + receivedDistances[2] + ">");
+        System.out.println("Receives distance vector from router " + neighbor + ": <" + receivedDistances[0] + ", " + receivedDistances[1] + ", " + receivedDistances[2] + ">");
         changeDistanceVectors(receivedDistances, neighbor);
     }
 
@@ -130,7 +184,7 @@ public class Main
      */
     public static void printCurrentDistances()
     {
-        System.out.println("<" + distances[index][0] + "," + distances[index][1] + "," + distances[index][2] + ">");
+        System.out.println("<" + distances[usIndex + 1][0] + "," + distances[usIndex + 1][1] + "," + distances[usIndex + 1][2] + ">");
     }
 
     /**
@@ -140,16 +194,27 @@ public class Main
     {
         boolean updated = false;
 
-        // TODO: do distance vector updates
+        int distToNeighbor = distances[usIndex + 1][neighbor];
 
-        if (neighbor == 1)
+        if (neighbor == neighbor1Index)
         {
-            //int newDist = Math.min(neighborVector[neighbor2Index] + distances[neighbor1Index], );
+            int newDist = distToNeighbor + neighborVector[neighbor2Index];
+            // if it is fastor to go through this neighbor than current method update
+            if (newDist < distances[usIndex + 1][neighbor2Index])
+            {
+                distances[usIndex + 1][neighbor2Index] = newDist;
+                updated = true;
+            }
         }
-        // its neighbor 2
-        else
+        else if (neighbor == neighbor2Index)
         {
-
+            int newDist = distToNeighbor + neighborVector[neighbor1Index];
+            // if it is fastor to go through this neighbor than current method update
+            if (newDist < distances[usIndex + 1][neighbor1Index])
+            {
+                distances[usIndex + 1][neighbor1Index] = newDist;
+                updated = true;
+            }
         }
 
 
@@ -157,6 +222,7 @@ public class Main
         {
             System.out.println("Distance vector on router " + routerName + " is updated to:");
             printCurrentDistances();
+            sendDistances();
         }
         else
         {
@@ -164,11 +230,6 @@ public class Main
         }
     }
 
-    public static String getRouter()
-    {
-        Scanner in = new Scanner(System.in);
-        return in.nextLine();
-    }
 
     private static int[][] getDistances() {
         int[][] toReturn = new int[4][3];

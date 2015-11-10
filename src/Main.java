@@ -1,3 +1,21 @@
+/**
+ *
+ * Fred Kneeland and Collin Moore
+ * CSCI 466
+ * Lab #5
+ *
+ * Running Instructions:
+ * Start up instance one give it 'X' or 'Y' or 'Z' in console
+ * Start up instance two give it 'X' or 'Y' or 'Z' in console
+ * Start up instance three give it 'X' or 'Y' or 'Z' in console
+ *
+ * and the three routers will communicate and update automatically, printing out when they receive
+ * a vector from a neighbor and whether or not they update
+ *
+ */
+
+
+
 import java.util.*;
 import java.net.*;
 import java.io.*; // for files
@@ -24,19 +42,19 @@ public class Main
         Scanner in = new Scanner(System.in);
         distances = getDistances();
 
-        for (int i = 0; i < distances.length; i++)
-        {
-            for (int j = 0; j < distances[i].length; j++)
-            {
-                System.out.print(distances[i][j] + ", ");
-            }
-            System.out.println();
-        }
+//        for (int i = 0; i < distances.length; i++)
+//        {
+//            for (int j = 0; j < distances[i].length; j++)
+//            {
+//                System.out.print(distances[i][j] + ", ");
+//            }
+//            System.out.println();
+//        }
 
         // get which router we are
         System.out.println("Enter the router’s ID: ");
         String next = in.nextLine();
-        System.out.println(next);
+//        System.out.println(next);
 
         usIndex = 2;
 
@@ -56,7 +74,7 @@ public class Main
 
         portNumb = distances[0][usIndex];
 
-        System.out.println(portNumb);
+//        System.out.println(portNumb);
 
         routerName = next;
         try { IPAddress = InetAddress.getByName("localhost"); me = new DatagramSocket(portNumb); } catch (Exception e) { System.out.println("Error: " + e); }
@@ -104,7 +122,7 @@ public class Main
             }
         }
 
-        System.out.println("After Acks: " + System.currentTimeMillis());
+//        System.out.println("After Acks: " + System.currentTimeMillis());
 
         printDistances();
 
@@ -240,31 +258,35 @@ public class Main
             StringBuilder sb = new StringBuilder();
             int i=0;
             char ch = line.charAt(i);
-            while (ch != '\t') {
+            while (ch >= '0' && ch <= '9') {
                 sb.append(ch);
                 i++;
                 ch = line.charAt(i);
             }
             String firstNumber = sb.toString();
             int number = Integer.parseInt(firstNumber);
-            System.out.println(number);
             toReturn[0][0] = number;
-            i++; // move i past the \t
-            ch = line.charAt(i);
+            while (ch < '0' || ch > '9')
+            {
+                i++; // move i past the \t
+                ch = line.charAt(i);
+            }
             sb = new StringBuilder();
-            while (ch != '\t') {
+            while (ch >= '0' && ch <= '9') {
                 sb.append(ch);
                 i++;
                 ch = line.charAt(i);
             }
             firstNumber = sb.toString();
             number = Integer.parseInt(firstNumber);
-            System.out.println(number);
             toReturn[0][1]=number; // port of the second router
-            i++; // move i past the \t
-            ch = line.charAt(i);
+            while (ch < '0' || ch > '9')
+            {
+                i++; // move i past the \t
+                ch = line.charAt(i);
+            }
             sb = new StringBuilder();
-            while (ch != '\t' && i < line.length()) {
+            while (ch >= '0' && ch <= '9' && i < line.length()) {
                 sb.append(ch);
                 i++;
                 if (i < line.length())
@@ -274,7 +296,6 @@ public class Main
             }
             firstNumber = sb.toString();
             number = Integer.parseInt(firstNumber);
-            System.out.println(number);
             toReturn[0][2]=number; // port of the third router
             String line2 = bufferedReader.readLine();
             String line3 = bufferedReader.readLine();

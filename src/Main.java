@@ -56,15 +56,21 @@ public class Main
         String next = in.nextLine();
 //        System.out.println(next);
 
-        usIndex = 2;
 
-        if (next.equals("X"))
+        if (next.equals("X")||next.equals("x"))
         {
             usIndex = 0;
         }
-        else if (next.equals("Y"))
+        else if (next.equals("Y")||next.equals("y"))
         {
             usIndex = 1;
+        }
+        else if(next.equals("Z")||next.equals("z"))
+        {
+            usIndex = 2;
+        }
+        else{
+            return;// leave if not x, y, or z
         }
 
         neighbor1Index = (usIndex + 1) % 3;
@@ -78,7 +84,6 @@ public class Main
 
         routerName = next;
         try { IPAddress = InetAddress.getByName("localhost"); me = new DatagramSocket(portNumb); } catch (Exception e) { System.out.println("Error: " + e); }
-
 
         boolean ack1 = false;
         boolean ack2 = false;
@@ -128,10 +133,34 @@ public class Main
 
         sendDistances();
 
-
-        while (true)
+        int counter = 0;
+        while (counter<50) // only try  for 5 seconds
         {
             receiveDistVectors();
+            try {
+                Thread.sleep(100);
+            }
+            catch (Exception e) { System.out.println("Error: " + e); }
+            counter++;
+        }
+
+        // counter has now expired
+        if(usIndex==0){ // if this is router X
+            distances[usIndex + 1][1]=60; // x-y link changes to 60
+        }
+        if(usIndex==0){
+            distances[usIndex + 1][0]=60; // y-x link changes to 60
+        }
+        printDistances();
+
+        sendDistances();
+
+        while(true){
+            receiveDistVectors();
+            try {
+                Thread.sleep(100);
+            }
+            catch (Exception e) { System.out.println("Error: " + e); }
         }
     }
 

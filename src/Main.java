@@ -134,7 +134,7 @@ public class Main
         sendDistances();
 
         int counter = 0;
-        while (counter<50) // only try  for 5 seconds
+        while (counter<50) // only try  for about 5 to 10 seconds
         {
             receiveDistVectors();
             try {
@@ -210,7 +210,14 @@ public class Main
         // TODO: Add decrypting message here
         byte[] data = new byte[4];
         packet = new DatagramPacket(data, data.length);
-        try { me.receive(packet); } catch (Exception e) { System.out.println("Error: " + e); }
+        try{me.setSoTimeout(100); }// wait 100ms max to receive packet. Will throw java.net.SocketTimeoutException if exceeded
+        catch (Exception e) { System.out.println("Error: " + e); }
+        try { me.receive(packet); }
+        catch (java.net.SocketTimeoutException e){
+            System.out.println("Timed out waiting for packet");
+            return ; // if it times out, just give up this time.
+        }
+        catch (Exception e) { System.out.println("Error: " + e); }
 
         int neighbor = (int) data[0];
         if (neighbor > 15)

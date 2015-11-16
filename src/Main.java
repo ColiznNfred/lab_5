@@ -25,6 +25,7 @@ public class Main
     private static int instanceNumber = 6667;
     public static String configFile = "configuration.txt";
     public static int[][] distances;
+    public static int[] neighborLinks;
     public static String routerName;
     public static int portNumb;
     public static int neighbor1Port;
@@ -41,6 +42,7 @@ public class Main
     {
         Scanner in = new Scanner(System.in);
         distances = getDistances();
+        neighborLinks = new int[3];
 
 //        for (int i = 0; i < distances.length; i++)
 //        {
@@ -77,6 +79,7 @@ public class Main
         neighbor2Index = (usIndex + 2) % 3;
         neighbor1Port = distances[0][neighbor1Index];
         neighbor2Port = distances[0][neighbor2Index];
+        neighborLinks=distances[usIndex+1]; // get distances of links from this router to others.
 
         portNumb = distances[0][usIndex];
 
@@ -146,10 +149,10 @@ public class Main
 
         // counter has now expired
         if(usIndex==0){ // if this is router X
-            distances[usIndex + 1][1]=60; // x-y link changes to 60
+            neighborLinks[1]=60; // x-y link changes to 60
         }
-        if(usIndex==0){
-            distances[usIndex + 1][0]=60; // y-x link changes to 60
+        if(usIndex==1){
+            neighborLinks[0]=60; // y-x link changes to 60
         }
         printDistances();
 
@@ -214,7 +217,7 @@ public class Main
         catch (Exception e) { System.out.println("Error: " + e); }
         try { me.receive(packet); }
         catch (java.net.SocketTimeoutException e){
-            System.out.println("Timed out waiting for packet");
+           // System.out.println("Timed out waiting for packet");
             return ; // if it times out, just give up this time.
         }
         catch (Exception e) { System.out.println("Error: " + e); }
@@ -248,7 +251,7 @@ public class Main
     {
         boolean updated = false;
 
-        int distToNeighbor = distances[usIndex + 1][neighbor];
+        int distToNeighbor = neighborLinks[neighbor];
 
         if (neighbor == neighbor1Index)
         {
